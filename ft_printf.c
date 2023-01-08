@@ -58,53 +58,52 @@ int	ft_itoa_base(unsigned long long nbr, int base, char *str, int mod)
 	return (len);
 }
 
-int	ft_check_format(va_list args, char format)
+int	ft_check_format(va_list args, const char **str, int len)
 {
-	int	len;
-
-	len = 0;
-	if (format == 'c')
+	if (**str != '%')
+		len += ft_putchar(*(*str)++);
+	else if ((*++(*str)) == 'c' && (*str)++)
 		len += ft_putchar(va_arg(args, int));
-	else if (format == 's')
+	else if ((**str) == 's' && (*str)++)
 		len += ft_putstr(va_arg(args, char *));
-	else if (format == 'u')
+	else if ((**str) == 'u' && (*str)++)
 		len += ft_itoa_base(va_arg(args, unsigned int), 10, "0123456789", 0);
-	else if (format == 'd' || format == 'i' || format == 'u')
+	else if (((**str) == 'd' || (**str) == 'i' || (**str) == 'u') && (*str)++)
 		len += ft_itoa_base(va_arg(args, int), 10, "0123456789", 1);
-	else if (format == 'p')
+	else if ((**str) == 'p' && (*str)++)
 		len += ft_itoa_base(va_arg(args, unsigned long long), 16,
 				"0123456789abcdef", 2);
-	else if (format == 'x')
+	else if ((**str) == 'x' && (*str)++)
 		len += ft_itoa_base(va_arg(args, unsigned int), 16,
 				"0123456789abcdef", 0);
-	else if (format == 'X')
+	else if ((**str) == 'X' && (*str)++)
 		len += ft_itoa_base(va_arg(args, unsigned int), 16,
 				"0123456789ABCDEF", 0);
-	else if (format == '%')
+	else if ((**str) == '%' && (*str)++)
 		len += ft_putchar('%');
 	return (len);
 }
 
 int	ft_printf(const char *str, ...)
 {
-	int		index;
 	int		len;
 	va_list	args;
 
-	index = 0;
 	len = 0;
 	va_start(args, str);
-	while (str[index] != '\0')
-	{
-		if (str[index] == '%')
-		{
-			index++;
-			len += ft_check_format(args, str[index]);
-		}
-		else
-			len += ft_putchar(str[index]);
-		index++;
-	}
+	while (*str != '\0')
+		len += ft_check_format(args, &str, 0);
 	va_end(args);
 	return (len);
 }
+/* #include <stdio.h>
+int	main(void)
+{
+	//int a;
+	//void	*p = &a;
+	char b;
+
+	b = 'w';
+	printf("%d\n", ft_printf("|my,   |%d| asdds|", 12333));
+	printf("%d", printf("|or,   |%d| asdds|", 12333));
+} */
